@@ -1,0 +1,24 @@
+// comments are ignored.
+
+/*
+    ... and copied from C.
+*/
+
+// 'options', or simply 'opts' are options that are just booleans.
+opt enable_gcc{true};
+
+// where as 'settings' or 'set' are options that require
+// specific arguments
+set lang{c++};
+set cmpl{g++};
+
+// 'directory' or 'dir' assigns the essential source directories.
+dir src{myProject/source};
+dir inc{myProject/include};
+
+// there are also optional 'lib' dependancy directories
+dir lib{myProject/libraries};
+
+// 'project' or 'proj' defines project name, and binary output name.
+proj name{myProject};
+proj out{myProgram};

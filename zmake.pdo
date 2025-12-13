@@ -1,0 +1,18 @@
+// This is the example ZMake.pdo example file. I am now going to test to see how long I can make lines before something bad starts to happen. I would assume it's around this point where that would be. If I set the char variable to 128, this line would need to be over 128 characters to reach that limit. I don't know if I've reached that limit yet. We'll know once I run the test again. It works fine with a line this long. No one in their right mind would make a line this long I hope.
+
+/*
+ * okay well now that I know that I can parse by line, it should make
+ * comments really easy.
+ */
+
+opt enable_libraries{true}
+
+set lang{c++};
+set compl{g++};
+
+dir src{./src}; 
+dir inc{./inc};
+dir lib{./lib};
+
+proj name{ZMake};
+proj out{zmake};
