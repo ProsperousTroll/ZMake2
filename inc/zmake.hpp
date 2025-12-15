@@ -53,7 +53,7 @@ namespace ZMake {
       {"--version", [](Args const& arg){ std::cout << "ZMake " << version << '\n'; }},
       {"--help", [](Args const& arg){ printUsage(); }},
       {"--parse", [](Args const& arg){ Parser::parseInput(Parser::projectFile); }},
-      {"new", [](Args const&arg){
+      {"new", [](Args const& arg){
          try {
             if(arg.size() < 2){
                throw Error("Please enter project name!");

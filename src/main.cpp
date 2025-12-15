@@ -1,7 +1,7 @@
 #include "../inc/zmake.hpp"
 
 // enable debugging
-// #define DEBUG
+#define DEBUG
 
 int main(int argc, char* argv[]){
    if (argc < 2){
@@ -39,11 +39,10 @@ int main(int argc, char* argv[]){
 
 
    #ifdef DEBUG
-
    for (auto& arg : userIn){
       std::cout << arg << '\n';
    }
-
    #endif
+
    return 0;
 }
