@@ -63,6 +63,7 @@ namespace ZMake {
 
             std::string projectName{arg[1]};
             std::cout << "Creating new project directory named '" + projectName + "'...\n";
+
          }
 
          catch(Error& e){
