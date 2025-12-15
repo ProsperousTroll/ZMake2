@@ -30,10 +30,3 @@ ifeq ($(BUILD),build)
 else
 	@echo ERROR: Cannot find build folder. Did you build yet?
 endif
-
-test:
-ifeq ($(BUILD),build)
-	@echo $(build)
-else
-	@echo $(BUILD)
-endif
