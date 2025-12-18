@@ -1,16 +1,17 @@
 #pragma once
+#include <filesystem>
+#include <fstream>
 #include <functional>
 #include <unordered_map>
 #include <vector>
 #include <iostream>
+#include <cstring>
 #include <string>
 #include "parser.hpp"
-#include <cstring>
 #include <iostream>
 
 namespace ZMake {
    inline std::string version{"0.0.1"};
-
    inline std::vector<std::string> usage{
       "ZMake " + version + " \n",
       "Usage: zmake <flag> <command> \n",
@@ -46,33 +47,89 @@ namespace ZMake {
       }
    };
 
+
    using Args = std::vector<std::string>;
    using Handler = std::function<void(Args const& arg)>;
-
    inline std::unordered_map<std::string, Handler> CommandHandler{
       {"--version", [](Args const& arg){ std::cout << "ZMake " << version << '\n'; }},
       {"--help", [](Args const& arg){ printUsage(); }},
       {"--parse", [](Args const& arg){ Parser::parseInput(Parser::projectFile); }},
       {"new", [](Args const& arg){
+         using namespace std::filesystem;
+         using FileIn = std::ifstream;
+         using FileOut = std::ofstream;
+         struct File {
+            std::string type, filePath;
+
+            File(std::string const& p, std::string const& t){
+               filePath = t;
+               type = p;
+            }
+            void create(std::string& proj){
+               if(this->type == "file"){
+                  std::cout << ">> Creating file " << this->filePath << "...\n";
+                  FileOut{proj + filePath};
+               } 
+               if (this->type == "dir"){
+                  std::cout << ">> Creating directory " << this->filePath << "...\n";
+                  create_directories(proj + filePath);
+               }
+            }
+         };
+
          try {
+
             if(arg.size() < 2){
                throw Error("Please enter project name!");
             } else if (arg.size() > 2){
-               throw Error("Too many arguments! Please enter a project name only.");
+               throw Error("Too many arguments! Please enter a project name only. (No spaces.)");
             }
 
             std::string projectName{arg[1]};
             std::cout << "Creating new project directory named '" + projectName + "'...\n";
 
-         }
+            std::vector<File> tree {
+               {"dir", "/src"},
+               {"dir", "/inc"},
+               {"file", "/src/main.c"},
+               {"file", "/inc/" + projectName + ".h"},
+               {"file", "/zmake.pdo"},
+            };
+            for (auto& t : tree){
+               t.create(projectName);
+            }
+            /*
+             * all that just to accomplish this. But it scales easier? IDEK bro i'm a noob
+             *
+            create_directory(projectName);
+            create_directory(projectName + "/src");
+            create_directory(projectName + "/inc");
 
-         catch(Error& e){
-            std::cerr << e.what() << '\n';
+            FileOut main{projectName + "/src/main.c"};
+            FileOut header{projectName + "/inc/" + projectName + ".h"};
+            FileOut config{projectName + "/zmake.pdo"};
+            */
          }
-
-         catch(...){
-            std::cerr << "ERROR: Unknown crash.\n";
-         }
+         catch(Error& e){ std::cerr << e.what() << '\n'; }
+         catch(...){ std::cerr << "ERROR: An unknown error has occured.\n"; }
       }},
    };
+
+   inline void runArgs(Args const& arg){
+      for (auto const& a : arg){
+         try {
+            if(CommandHandler.find(a) == 0){
+               throw Error("Argument '" + a + "' does not exist.");
+            // Band-aid fix. 'new' is the only command that requires input. 
+            // TODO: Make the command vector only store one command.
+            } else if (a == "new"){
+               CommandHandler["new"](arg);
+               break;
+            } 
+            else CommandHandler[a](arg);
+         }
+         catch(Error& e){ std::cerr << e.what() << '\n'; }
+         catch(...){ std::cerr << "ERROR: An unknown error has occured.\n"; }
+      }
+   }
 }
