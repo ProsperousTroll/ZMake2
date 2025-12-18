@@ -49,13 +49,12 @@ namespace ZMake {
       }
    };
 
-
    using Args = std::vector<std::string>;
    using Handler = std::function<void(Args const& arg)>;
    inline std::unordered_map<std::string, Handler> CommandHandler{
       {"--version", [](Args const& arg){ std::cout << "ZMake " << version << '\n'; }},
       {"--help", [](Args const& arg){ printUsage(); }},
-      {"--parse", [](Args const& arg){ Parser::parseInput(Parser::projectFile); }},
+      {"--parse", [](Args const& arg){ Parser::parseTest(Parser::projectFile); }},
       {"build", [](Args const& arg) { system("cd build && make"); }},
       {"clean", [](Args const& arg) { system("cd build && make clean"); }},
       {"run", [](Args const& arg) { system("cd build && make run"); }},
@@ -78,8 +77,6 @@ namespace ZMake {
             std::vector<Templates::File> tree {
                {"dir", "/src"},
                {"dir", "/inc"},
-               {"dir", "/build"},
-               {"file", "/build/Makefile"},
                {"file", "/src/main.c"},
                {"file", "/inc/" + projectName + ".h"},
                {"file", "/zmake.pdo"},
@@ -96,7 +93,6 @@ namespace ZMake {
          catch(...){ std::cerr << "ERROR: An unknown error has occured.\n"; }
       }},
    };
-
    inline void runArgs(Args const& arg){
       for (auto const& a : arg){
          try {

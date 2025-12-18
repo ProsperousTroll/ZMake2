@@ -30,7 +30,7 @@ namespace Parser{
    }
 
    inline std::ifstream projectFile("zmake.pdo");
-   inline std::vector<std::string> parseInput(std::ifstream& input){
+   inline std::vector<std::string> parseTest(std::ifstream& input){
       char test[512];
       std::vector<std::string> read;
       while(input.is_open()){
