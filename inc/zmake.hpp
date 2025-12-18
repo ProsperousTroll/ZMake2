@@ -8,8 +8,9 @@
 #include <iostream>
 #include <cstring>
 #include <string>
-#include "parser.hpp"
 #include <iostream>
+#include "parser.hpp"
+#include "templates.hpp"
 
 namespace ZMake {
    inline std::string version{"0.0.1"};
@@ -40,7 +41,7 @@ namespace ZMake {
       std::string error;
 
       std::string what(){
-         return {"ERROR: " + error};
+         return {">> ERROR: " + error};
       }
 
       Error(std::string const& in){
@@ -55,44 +56,26 @@ namespace ZMake {
       {"--version", [](Args const& arg){ std::cout << "ZMake " << version << '\n'; }},
       {"--help", [](Args const& arg){ printUsage(); }},
       {"--parse", [](Args const& arg){ Parser::parseInput(Parser::projectFile); }},
-      {"build", [](Args const& arg) { system("make"); }},
-      {"clean", [](Args const& arg) { system("make clean"); }},
-      {"run", [](Args const& arg) { system("make run"); }},
+      {"build", [](Args const& arg) { system("cd build && make"); }},
+      {"clean", [](Args const& arg) { system("cd build && make clean"); }},
+      {"run", [](Args const& arg) { system("cd build && make run"); }},
       {"new", [](Args const& arg){
          using namespace std::filesystem;
          using FileIn = std::ifstream;
          using FileOut = std::ofstream;
-         struct File {
-            std::string type, filePath;
-
-            File(std::string const& p, std::string const& t){
-               filePath = t;
-               type = p;
-            }
-            void create(std::string& proj){
-               if(this->type == "file"){
-                  std::cout << ">> Creating file " << this->filePath << "...\n";
-                  FileOut{proj + filePath};
-               } 
-               if (this->type == "dir"){
-                  std::cout << ">> Creating directory " << this->filePath << "...\n";
-                  create_directories(proj + filePath);
-               }
-            }
-         };
 
          try {
 
             if(arg.size() < 2){
-               throw Error("Please enter project name!");
+               throw Error(">> Please enter project name!");
             } else if (arg.size() > 2){
-               throw Error("Too many arguments! Please enter a project name only. (No spaces.)");
+               throw Error(">> Too many arguments! Please enter a project name only. (No spaces.)");
             }
 
             std::string projectName{arg[1]};
-            std::cout << "Creating new project directory named '" + projectName + "'...\n";
+            std::cout << ">> Creating new project directory named '" + projectName + "'...\n";
 
-            std::vector<File> tree {
+            std::vector<Templates::File> tree {
                {"dir", "/src"},
                {"dir", "/inc"},
                {"dir", "/build"},
@@ -100,21 +83,14 @@ namespace ZMake {
                {"file", "/src/main.c"},
                {"file", "/inc/" + projectName + ".h"},
                {"file", "/zmake.pdo"},
+               {"file", "/.gitignore"},
             };
             for (auto& t : tree){
                t.create(projectName);
             }
-            /*
-             * all that just to accomplish this. But it scales easier? IDEK bro i'm a noob
-             *
-            create_directory(projectName);
-            create_directory(projectName + "/src");
-            create_directory(projectName + "/inc");
 
-            FileOut main{projectName + "/src/main.c"};
-            FileOut header{projectName + "/inc/" + projectName + ".h"};
-            FileOut config{projectName + "/zmake.pdo"};
-            */
+            // there must be a better way.
+            system(std::string{"cd " + projectName + " && git init -q"}.c_str());
          }
          catch(Error& e){ std::cerr << e.what() << '\n'; }
          catch(...){ std::cerr << "ERROR: An unknown error has occured.\n"; }
