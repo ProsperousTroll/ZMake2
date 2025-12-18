@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -54,6 +55,9 @@ namespace ZMake {
       {"--version", [](Args const& arg){ std::cout << "ZMake " << version << '\n'; }},
       {"--help", [](Args const& arg){ printUsage(); }},
       {"--parse", [](Args const& arg){ Parser::parseInput(Parser::projectFile); }},
+      {"build", [](Args const& arg) { system("make"); }},
+      {"clean", [](Args const& arg) { system("make clean"); }},
+      {"run", [](Args const& arg) { system("make run"); }},
       {"new", [](Args const& arg){
          using namespace std::filesystem;
          using FileIn = std::ifstream;
@@ -91,6 +95,8 @@ namespace ZMake {
             std::vector<File> tree {
                {"dir", "/src"},
                {"dir", "/inc"},
+               {"dir", "/build"},
+               {"file", "/build/Makefile"},
                {"file", "/src/main.c"},
                {"file", "/inc/" + projectName + ".h"},
                {"file", "/zmake.pdo"},
